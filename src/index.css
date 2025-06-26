@@ -1,0 +1,73 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    line-height: 1.6;
+}
+
+.placeholder-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    min-height: calc(100vh - 80px);
+    background-color: #f5f5f5;
+    text-align: center;
+}
+
+.placeholder-page h2 {
+    color: #1a1a2e;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.placeholder-page h2::after {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 3px;
+    background-color: #e94560;
+    bottom: -10px;
+    left: 25%;
+    border-radius: 2px;
+}
+
+.placeholder-page p {
+    font-size: 1.2rem;
+    color: #555;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+@media (max-width: 768px) {
+    .placeholder-page {
+        padding: 2rem 1rem;
+    }
+    
+    .placeholder-page h2 {
+        font-size: 2rem;
+    }
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+}
+
+.card-img-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 220px;
+    overflow: hidden;
+}
