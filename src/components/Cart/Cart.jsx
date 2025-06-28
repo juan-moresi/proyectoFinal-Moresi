@@ -19,7 +19,7 @@ const Cart = () => {
         {/* Sugerencias para carrito vacío */}
         <RandomSuggestions 
           count={4} 
-          title="Productos Relaciondos"
+          title="Productos Relacionados"
         />
       </div>
     );
