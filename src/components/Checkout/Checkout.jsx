@@ -99,8 +99,8 @@ const Checkout = () => {
     // Validar código postal
     if (!formData.postalCode.trim()) {
       newErrors.postalCode = 'El código postal es requerido';
-    } else if (!/^[0-9]{5}$/.test(formData.postalCode)) {
-      newErrors.postalCode = 'Código postal inválido (5 dígitos)';
+    } else if (!/^[0-9]{4}$/.test(formData.postalCode)) {
+      newErrors.postalCode = 'Código postal inválido (4 dígitos)';
     }
     
     setErrors(newErrors);
