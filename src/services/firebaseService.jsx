@@ -4,8 +4,8 @@ import { initializeApp } from 'firebase/app';
 // Firebase configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API,
-  authDomain: "sneakers-data-7e07c.firebaseapp.com",
-  projectId: "sneakers-data-7e07c",
+  authDomain: import.meta.env.VITE_DOMAIN,
+  projectId: import.meta.env.VITE_ID,
   storageBucket: "sneakers-data-7e07c.firebasestorage.app",
   messagingSenderId: "793126498848",
   appId: "1:793126498848:web:16231707ecb0eb7db6c245"
