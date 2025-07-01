@@ -3,7 +3,7 @@ import { initializeApp } from 'firebase/app';
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.API_KEY,
+  apiKey: import.meta.env.VITE_API,
   authDomain: "sneakers-data-7e07c.firebaseapp.com",
   projectId: "sneakers-data-7e07c",
   storageBucket: "sneakers-data-7e07c.firebasestorage.app",
