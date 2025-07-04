@@ -1,4 +1,4 @@
-import { getFirestore, collection, getDocs, doc, getDoc, query, where } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, getDoc, query, where, addDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 
 // Firebase configuration
@@ -102,5 +102,87 @@ export const getRandomProducts = async (count = 4) => {
   } catch (error) {
     console.error('Error fetching random products:', error);
     throw new Error('No se pudieron cargar las sugerencias');
+  }
+};
+
+
+// Función para crear una orden en Firestore
+export const createOrder = async (orderData) => {
+  try {
+    const ordersCollection = collection(db, 'orders');
+    
+    // Preparar los datos de la orden
+    const order = {
+      ...orderData,
+      createdAt: serverTimestamp(),
+      status: 'pending', // Estado inicial de la orden
+      total: orderData.items.reduce((total, item) => total + (item.price * item.quantity), 0)
+    };
+    
+    // Agregar la orden a Firestore
+    const docRef = await addDoc(ordersCollection, order);
+    
+    return {
+      id: docRef.id,
+      ...order
+    };
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw new Error('No se pudo crear la orden');
+  }
+};
+
+// Función para obtener una orden por ID
+export const getOrderById = async (orderId) => {
+  try {
+    const orderDoc = doc(db, 'orders', orderId);
+    const orderSnapshot = await getDoc(orderDoc);
+    
+    if (orderSnapshot.exists()) {
+      return {
+        id: orderSnapshot.id,
+        ...orderSnapshot.data()
+      };
+    } else {
+      throw new Error('Orden no encontrada');
+    }
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    throw new Error('No se pudo cargar la orden');
+  }
+};
+
+// Función para obtener todas las órdenes (para admin)
+export const getAllOrders = async () => {
+  try {
+    const ordersCollection = collection(db, 'orders');
+    const ordersSnapshot = await getDocs(ordersCollection);
+    const ordersList = ordersSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+    
+    // Ordenar por fecha de creación (más recientes primero)
+    return ordersList.sort((a, b) => {
+      if (a.createdAt && b.createdAt) {
+        return b.createdAt.toDate() - a.createdAt.toDate();
+      }
+      return 0;
+    });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    throw new Error('No se pudieron cargar las órdenes');
+  }
+};
+
+// Función para eliminar una orden
+export const deleteOrder = async (orderId) => {
+  try {
+    const orderDoc = doc(db, 'orders', orderId);
+    await deleteDoc(orderDoc);
+    return { success: true, message: 'Orden eliminada correctamente' };
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    throw new Error('No se pudo eliminar la orden');
   }
 };

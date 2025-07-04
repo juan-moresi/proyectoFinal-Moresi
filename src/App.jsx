@@ -9,6 +9,7 @@ import Contact from './components/Contact/Contact'
 import NotFound from './components/NotFound/NotFound'
 import HomePage from './components/HomePage/HomePage';
 import Footer from './components/Footer/Footer'
+import AdminPanel from './components/AdminPanel/AdminPanel'
 
 function App() {
 
@@ -57,6 +58,12 @@ function App() {
                 <Route
                     path="/contact"
                     element={<Contact />}
+                />
+
+                {/* Panel de Administración */}
+                <Route
+                    path="/admin"
+                    element={<AdminPanel />}
                 />
 
                 {/* Ruta 404 */}

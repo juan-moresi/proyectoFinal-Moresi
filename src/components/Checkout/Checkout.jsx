@@ -1,10 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext';
+import { createOrder } from '../../services/firebaseService';
 import './Checkout.css';
 
 const Checkout = () => {
-  const { cart, totalPrice, clear } = useContext(CartContext);
+  const { cart, totalPrice, totalItems, clear } = useContext(CartContext);
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -24,7 +25,9 @@ const Checkout = () => {
     loading: false,
     success: false,
     error: null,
-    orderId: null
+    orderId: null,
+    orderTotalItems: 0,
+    orderTotalPrice: 0
   });
 
   // Redirigir al carrito si está vacío
@@ -117,29 +120,60 @@ const Checkout = () => {
     setOrderStatus({ ...orderStatus, loading: true, error: null });
     
     try {
-      // Simulamos una llamada a API con un timeout
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Guardar los totales antes de limpiar el carrito
+      const currentTotalItems = totalItems;
+      const currentTotalPrice = totalPrice;
       
-      // Generar un ID de orden aleatorio
-      const orderId = Math.random().toString(36).substr(2, 9).toUpperCase();
+      // Preparar los datos de la orden
+      const orderData = {
+        buyer: {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          postalCode: formData.postalCode
+        },
+        items: cart.map(item => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          size: item.size,
+          category: item.category,
+          pictureUrl: item.pictureUrl
+        })),
+        totalItems: currentTotalItems,
+        totalAmount: currentTotalPrice,
+        comments: formData.comments || '',
+        orderDate: new Date().toISOString()
+      };
       
-      // Simulamos una respuesta exitosa
+      // Crear la orden en Firestore
+      const createdOrder = await createOrder(orderData);
+      
       setOrderStatus({
         loading: false,
         success: true,
         error: null,
-        orderId: orderId
+        orderId: createdOrder.id,
+        orderTotalItems: currentTotalItems,
+        orderTotalPrice: currentTotalPrice
       });
       
       // Limpiar el carrito después de una orden exitosa
       clear();
       
     } catch (error) {
+      console.error('Error al crear la orden:', error);
       setOrderStatus({
         loading: false,
         success: false,
         error: 'Hubo un error al procesar tu orden. Por favor intenta nuevamente.',
-        orderId: null
+        orderId: null,
+        orderTotalItems: 0,
+        orderTotalPrice: 0
       });
     }
   };
@@ -152,7 +186,12 @@ const Checkout = () => {
         <h2>¡Gracias por tu compra!</h2>
         <p>Tu orden ha sido procesada correctamente.</p>
         <p className="order-id">ID de orden: <strong>{orderStatus.orderId}</strong></p>
-        <p>Recibirás un email con los detalles de tu compra.</p>
+        <p>Recibirás un email con los detalles de tu compra a: <strong>{formData.email}</strong></p>
+        <div className="order-details">
+          <h4>Resumen de tu compra:</h4>
+          <p>Total de productos: {orderStatus.orderTotalItems}</p>
+          <p>Monto total: ${orderStatus.orderTotalPrice.toFixed(2)}</p>
+        </div>
         <div className="success-actions">
           <Link to="/" className="back-to-shop-btn">Volver a la tienda</Link>
         </div>
@@ -330,6 +369,10 @@ const Checkout = () => {
           </div>
           
           <div className="checkout-totals">
+            <div className="checkout-items-count">
+              <span>Total de productos:</span>
+              <span>{totalItems}</span>
+            </div>
             <div className="checkout-subtotal">
               <span>Subtotal:</span>
               <span>${totalPrice.toFixed(2)}</span>
