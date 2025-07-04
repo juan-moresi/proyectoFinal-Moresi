@@ -25,10 +25,10 @@ const Cart = () => {
     );
   }
 
-  const handleQuantityChange = (itemId, currentQuantity, stock, change) => {
+  const handleQuantityChange = (itemId, currentQuantity, stock, change, size = null) => {
     const newQuantity = currentQuantity + change;
     if (newQuantity > 0 && newQuantity <= stock) {
-      updateItemQuantity(itemId, newQuantity);
+      updateItemQuantity(itemId, newQuantity, size);
     }
   };
 
@@ -59,52 +59,57 @@ const Cart = () => {
       </div>
       
       <div className="cart-items">
-        {cart.map((item) => (
-          <div key={item.id} className="cart-item">
-            <div className="cart-item-product">
-              <img src={item.pictureUrl} alt={item.title} className="cart-item-image" />
-              <div className="cart-item-details">
-                <h3>{item.title}</h3>
-                <p className="cart-item-category">{item.category}</p>
-                {item.size && <p className="cart-item-size">Talle: {item.size}</p>}
+        {cart.map((item) => {
+          // Crear key único para cada item
+          const itemKey = item.size ? `${item.id}-${item.size}` : item.id;
+          
+          return (
+            <div key={itemKey} className="cart-item">
+              <div className="cart-item-product">
+                <img src={item.pictureUrl} alt={item.title} className="cart-item-image" />
+                <div className="cart-item-details">
+                  <h3>{item.title}</h3>
+                  <p className="cart-item-category">{item.category}</p>
+                  {item.size && <p className="cart-item-size">Talle: {item.size}</p>}
+                </div>
+              </div>
+              
+              <div className="cart-item-price">${item.price.toFixed(2)}</div>
+              
+              <div className="cart-item-quantity">
+                <button 
+                  className="quantity-btn"
+                  onClick={() => handleQuantityChange(item.id, item.quantity, item.stock || 10, -1, item.size)}
+                  disabled={item.quantity <= 1}
+                >
+                  -
+                </button>
+                <span>{item.quantity}</span>
+                <button 
+                  className="quantity-btn"
+                  onClick={() => handleQuantityChange(item.id, item.quantity, item.stock || 10, 1, item.size)}
+                  disabled={item.quantity >= (item.stock || 10)}
+                >
+                  +
+                </button>
+              </div>
+              
+              <div className="cart-item-subtotal">
+                ${(item.price * item.quantity).toFixed(2)}
+              </div>
+              
+              <div className="cart-item-actions">
+                <button 
+                  className="remove-item-btn"
+                  onClick={() => removeItem(item.id, item.size)}
+                  aria-label="Eliminar producto"
+                >
+                  ×
+                </button>
               </div>
             </div>
-            
-            <div className="cart-item-price">${item.price.toFixed(2)}</div>
-            
-            <div className="cart-item-quantity">
-              <button 
-                className="quantity-btn"
-                onClick={() => handleQuantityChange(item.id, item.quantity, item.stock, -1)}
-                disabled={item.quantity <= 1}
-              >
-                -
-              </button>
-              <span>{item.quantity}</span>
-              <button 
-                className="quantity-btn"
-                onClick={() => handleQuantityChange(item.id, item.quantity, item.stock, 1)}
-                disabled={item.quantity >= item.stock}
-              >
-                +
-              </button>
-            </div>
-            
-            <div className="cart-item-subtotal">
-              ${(item.price * item.quantity).toFixed(2)}
-            </div>
-            
-            <div className="cart-item-actions">
-              <button 
-                className="remove-item-btn"
-                onClick={() => removeItem(item.id)}
-                aria-label="Eliminar producto"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       
       <div className="cart-summary">

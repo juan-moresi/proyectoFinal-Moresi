@@ -10,9 +10,11 @@ const Item = ({ id, title, price, pictureUrl, category, stock = 10 }) => {
   const [selectedSize, setSelectedSize] = useState('9'); // Valor predeterminado para zapatillas
   const { addItem, isInCart, cart, updateItemQuantity, removeItem } = useContext(CartContext);
   
-  // Obtener el producto del carrito si existe
-  const cartItem = cart.find(item => item.id === id);
-  const isProductInCart = isInCart(id);
+  // Obtener el producto del carrito si existe (considerando talle)
+  const cartItem = cart.find(item => 
+    item.id === id && item.size === (category !== 'accesorios' ? selectedSize : null)
+  );
+  const isProductInCart = isInCart(id, category !== 'accesorios' ? selectedSize : null);
   
   // URL de imagen de respaldo
   const fallbackImageUrl = "https://placehold.co/300x300/e2e2e2/333?text=Imagen+no+disponible";
@@ -25,7 +27,8 @@ const Item = ({ id, title, price, pictureUrl, category, stock = 10 }) => {
       price,
       pictureUrl,
       category,
-      size: category !== 'accesorios' ? selectedSize : null // Incluir talle solo si no es accesorio
+      stock, // Incluir stock en el item
+      size: category !== 'accesorios' ? selectedSize : null
     };
     addItem(item, quantity);
   };
@@ -81,7 +84,7 @@ const Item = ({ id, title, price, pictureUrl, category, stock = 10 }) => {
               <div className="quantity-controls-inline">
                 <button 
                   className="quantity-btn-inline"
-                  onClick={() => updateItemQuantity(id, Math.max(1, cartItem.quantity - 1))}
+                  onClick={() => updateItemQuantity(id, Math.max(1, cartItem.quantity - 1), cartItem.size)}
                   disabled={cartItem.quantity <= 1}
                 >
                   -
@@ -89,7 +92,7 @@ const Item = ({ id, title, price, pictureUrl, category, stock = 10 }) => {
                 <span className="quantity-display-inline">{cartItem.quantity}</span>
                 <button 
                   className="quantity-btn-inline"
-                  onClick={() => updateItemQuantity(id, Math.min(stock, cartItem.quantity + 1))}
+                  onClick={() => updateItemQuantity(id, Math.min(stock, cartItem.quantity + 1), cartItem.size)}
                   disabled={cartItem.quantity >= stock}
                 >
                   +
@@ -97,7 +100,7 @@ const Item = ({ id, title, price, pictureUrl, category, stock = 10 }) => {
               </div>
               <button 
                 className="remove-from-cart-btn"
-                onClick={() => removeItem(id)}
+                onClick={() => removeItem(id, cartItem.size)}
                 title="Eliminar del carrito"
               >
                 Eliminar
