@@ -40,12 +40,7 @@ Para configurar y ejecutar el proyecto localmente, sigue estos pasos:
     yarn install
     ```
 
-3.  **Configura Firebase**:
-    - Crea un proyecto en Firebase Console
-    - Configura Firestore Database
-    - Actualiza las credenciales en `firebaseService.jsx`
-
-4.  **Inicia el servidor de desarrollo**:
+3.  **Inicia el servidor de desarrollo**:
     ```bash
     npm run dev
     # o
@@ -129,7 +124,7 @@ El sistema de filtrado permite a los usuarios:
 Para acceder al panel de administración:
 
 1. Navega hasta el footer de la aplicación.
-2. Haz clic en "Admin - View Purchase Summary".
+2. Haz clic en "Admin - Ver resumen Compras".
 3. Serás redirigido a `/admin` donde podrás gestionar las órdenes.
 
 ## 🎨 Características de UI/UX
@@ -139,7 +134,7 @@ Para acceder al panel de administración:
 - **Animaciones suaves**: Transiciones fluidas entre estados.
 - **Iconografía consistente**: Uso coherente de iconos en toda la aplicación.
 
-## 🔧 Estructura del Proyecto
+
 
 
 © 2025 Sneakers Shop - Todos los derechos reservados
