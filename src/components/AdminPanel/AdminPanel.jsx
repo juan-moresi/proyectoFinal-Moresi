@@ -3,6 +3,7 @@ import { getAllOrders, deleteOrder } from '../../services/firebaseService';
 import './AdminPanel.css';
 
 const AdminPanel = () => {
+  // Estados para manejar las órdenes y la interfaz
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,7 +12,12 @@ const AdminPanel = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
 
+  // Efecto para cargar las órdenes al montar el componente
   useEffect(() => {
+    /**
+     * Función asíncrona para obtener todas las órdenes desde Firebase
+     * Maneja los estados de carga y error durante la petición
+     */
     const fetchOrders = async () => {
       try {
         setLoading(true);
@@ -27,14 +33,19 @@ const AdminPanel = () => {
     fetchOrders();
   }, []);
 
+  /**
+   * Función para eliminar una orden específica
+   * Actualiza la lista local y cierra el modal de confirmación
+   */
   const handleDeleteOrder = async () => {
     if (!orderToDelete) return;
 
     try {
       setDeleteLoading(orderToDelete.id);
+      // Eliminar la orden de Firebase
       await deleteOrder(orderToDelete.id);
       
-      // Actualizar la lista de órdenes
+      // Actualizar la lista de órdenes localmente
       setOrders(orders.filter(order => order.id !== orderToDelete.id));
       
       // Si la orden eliminada estaba seleccionada, limpiar la selección
@@ -42,6 +53,7 @@ const AdminPanel = () => {
         setSelectedOrder(null);
       }
       
+      // Cerrar el modal y limpiar estados
       setShowDeleteModal(false);
       setOrderToDelete(null);
     } catch (error) {
@@ -51,16 +63,28 @@ const AdminPanel = () => {
     }
   };
 
+  /**
+   * Función para abrir el modal de confirmación de eliminación
+   * @param {Object} order - La orden que se desea eliminar
+   */
   const openDeleteModal = (order) => {
     setOrderToDelete(order);
     setShowDeleteModal(true);
   };
 
+  /**
+   * Función para cerrar el modal de confirmación y limpiar estados
+   */
   const closeDeleteModal = () => {
     setShowDeleteModal(false);
     setOrderToDelete(null);
   };
 
+  /**
+   * Función para formatear fechas de timestamp de Firebase a formato legible
+   * @param {Object|String} timestamp - Timestamp de Firebase o string de fecha
+   * @returns {String} Fecha formateada en español
+   */
   const formatDate = (timestamp) => {
     if (!timestamp) return 'Fecha no disponible';
     try {
@@ -77,6 +101,11 @@ const AdminPanel = () => {
     }
   };
 
+  /**
+   * Función para formatear montos en pesos argentinos
+   * @param {Number} amount - Monto a formatear
+   * @returns {String} Monto formateado con símbolo de peso argentino
+   */
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -84,6 +113,7 @@ const AdminPanel = () => {
     }).format(amount);
   };
 
+  // Renderizado condicional para estado de carga
   if (loading) {
     return (
       <div className="admin-panel">
@@ -95,6 +125,7 @@ const AdminPanel = () => {
     );
   }
 
+  // Renderizado condicional para estado de error
   if (error) {
     return (
       <div className="admin-panel">
@@ -106,6 +137,7 @@ const AdminPanel = () => {
     );
   }
 
+  // Renderizado principal del componente
   return (
     <div className="admin-panel">
       <div className="admin-header">
@@ -119,6 +151,7 @@ const AdminPanel = () => {
         </div>
       ) : (
         <div className="orders-container">
+          {/* Lista de órdenes */}
           <div className="orders-list">
             <h3>Lista de Órdenes</h3>
             {orders.map((order) => (
@@ -157,6 +190,7 @@ const AdminPanel = () => {
             ))}
           </div>
 
+          {/* Panel de detalles de la orden seleccionada */}
           {selectedOrder && (
             <div className="order-details">
               <div className="order-details-header">
@@ -170,6 +204,7 @@ const AdminPanel = () => {
                 </button>
               </div>
               <div className="order-detail-card">
+                {/* Información del cliente */}
                 <div className="detail-section">
                   <h4>Información del Cliente</h4>
                   <p><strong>Nombre:</strong> {selectedOrder.buyer?.firstName} {selectedOrder.buyer?.lastName}</p>
@@ -180,6 +215,7 @@ const AdminPanel = () => {
                   <p><strong>Código Postal:</strong> {selectedOrder.buyer?.postalCode}</p>
                 </div>
 
+                {/* Lista de productos comprados */}
                 <div className="detail-section">
                   <h4>Productos Comprados</h4>
                   {selectedOrder.items?.map((item, index) => (
@@ -195,6 +231,7 @@ const AdminPanel = () => {
                   ))}
                 </div>
 
+                {/* Resumen de la orden */}
                 <div className="detail-section">
                   <h4>Resumen de la Orden</h4>
                   <p><strong>ID de Orden:</strong> {selectedOrder.id}</p>
@@ -212,7 +249,7 @@ const AdminPanel = () => {
         </div>
       )}
 
-      {/* Modal de confirmación - Movido fuera del map */}
+      {/* Modal de confirmación para eliminación de órdenes */}
       {showDeleteModal && (
         <div className="modal-overlay" onClick={closeDeleteModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
